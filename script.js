@@ -24,6 +24,8 @@ const renderCountry = function (data, neighbour = "") {
   countriesContainer.insertAdjacentHTML("beforeend", html);
 };
 const whereAmI = function (lat, lng) {
+  // const lat = 22.0814706;
+  // const lng = 81.1485254;
   fetch(
     `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
   )
@@ -32,7 +34,10 @@ const whereAmI = function (lat, lng) {
       return response.json();
     })
     .then((data) => {
-      text.textContent = `You are in ${data.principalSubdivision}, ${data.countryName}.`;
+      console.log(data);
+      text.textContent = `You are in ${
+        data.localityInfo.administrative[2].name.split(" ")[0]
+      }, ${data.countryName}.`;
       return fetch(`https://restcountries.eu/rest/v2/name/${data.countryName}`);
     })
     .then((response) => {
