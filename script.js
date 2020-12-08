@@ -1,11 +1,11 @@
-'use strict';
+"use strict";
 
-const btn = document.querySelector('.btn-country');
-const countriesContainer = document.querySelector('.countries');
-const text = document.querySelector('.city');
+const btn = document.querySelector(".btn-country");
+const countriesContainer = document.querySelector(".countries");
+const text = document.querySelector(".city");
 
 ///////////////////////////////////////
-const renderCountry = function (data, neighbour = '') {
+const renderCountry = function (data, neighbour = "") {
   // console.log(data);
   const html = `<article class="country ${neighbour}">
   <img class="country__img" src="${data.flag}" />
@@ -21,28 +21,30 @@ const renderCountry = function (data, neighbour = '') {
   <p class="country__row"><span>💰</span>${data.currencies[0].name}</p>
   </div>
   </article>`;
-  countriesContainer.insertAdjacentHTML('beforeend', html);
+  countriesContainer.insertAdjacentHTML("beforeend", html);
 };
 const whereAmI = function (lat, lng) {
-  fetch(` https://geocode.xyz/${lat},${lng}?geoit=json`)
-    .then(response => {
-      if (response.status === 403) throw new Error('Limit exceeded.');
+  fetch(
+    `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
+  )
+    .then((response) => {
+      if (response.status === 403) throw new Error("Limit exceeded.");
       return response.json();
     })
-    .then(data => {
-      text.textContent = `You are in ${data.city}, ${data.country}.`;
-      return fetch(`https://restcountries.eu/rest/v2/name/${data.country}`);
+    .then((data) => {
+      text.textContent = `You are in ${data.principalSubdivision}, ${data.countryName}.`;
+      return fetch(`https://restcountries.eu/rest/v2/name/${data.countryName}`);
     })
-    .then(response => {
+    .then((response) => {
       if (!response.ok) throw new Error(`Couldn't fetch the country`);
       return response.json();
     })
-    .then(data => {
+    .then((data) => {
       const i = data.length - 1;
       renderCountry(data[i]);
     })
-    .catch(err =>
-      countriesContainer.insertAdjacentText('beforeend', `${err.message}`)
+    .catch((err) =>
+      countriesContainer.insertAdjacentText("beforeend", `${err.message}`)
     )
     .finally(() => (countriesContainer.style.opacity = 1));
 };
@@ -50,15 +52,12 @@ navigator.geolocation.getCurrentPosition(
   function (position) {
     const { latitude, longitude } = position.coords;
 
-    btn.addEventListener('click', function () {
+    btn.addEventListener("click", function () {
       whereAmI(latitude, longitude);
       btn.style.opacity = 0;
     });
   },
   function () {
-    countriesContainer.insertAdjacentText(
-      'beforeend',
-      `Could not get the location.Please ,allow permissions`
-    );
+    alert("Location could not be obtained. Please, allow access.");
   }
 );
